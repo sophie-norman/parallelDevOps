@@ -18,7 +18,7 @@ stages:
   #First Stage on Ubuntu
   - stage: UbuntuQAEnvCheck
     jobs:
-    - job: InlineScripts
+    - job: UbuntuQAInlineScripts
 
       pool:
         vmImage: 'ubuntu-latest'
@@ -37,7 +37,7 @@ stages:
     dependsOn: UbuntuQAEnvCheck
     condition: succeeded()
     jobs:
-    - job: ExternalScripts
+    - job: UbuntuProdExternalScripts
       pool:
         vmImage: 'ubuntu-latest'
       # these variables only available in ExternalScripts job
@@ -66,7 +66,7 @@ stages:
     dependsOn: UbuntuQAEnvCheck
     condition: succeeded()
     jobs:
-    - job: InternalScripts
+    - job: WindowQAInternalScripts
     #Windows Microsoft hosted image
       pool:
         vmImage: 'windows-latest'
@@ -79,3 +79,23 @@ stages:
           echo Learning is fun, enquire below.
           echo See https://www.kavinschool.com/content/
         displayName: 'Run a multi-line script'
+
+  - stage: WindowsProdEnvCheck
+    dependsOn: 
+    - UbuntuProdEnvCheck
+    - WindowsQAEnvCheck
+    condition: succeeded()
+    jobs:
+    - job: ExternalScripts
+      pool:
+        vmImage: 'windows-latest'
+      steps:
+      - checkout: WindowsBatchRepo
+      - task: BatchScript@1
+        inputs:
+          filename: 'power.bat'
+          arguments: '3 4'
+      - task: BatchScript@1
+        inputs:
+          filename: 'calc.bat'
+          arguments: '300 100'
